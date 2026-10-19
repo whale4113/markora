@@ -1,0 +1,24 @@
+{
+  "name": "wordgard-typora-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5173",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 5173"
+  },
+  "dependencies": {
+    "dompurify": "^3.4.17",
+    "katex": "^0.19.0",
+    "lucide": "0.468.0",
+    "marked": "17.0.0",
+    "mermaid": "^11.17.2",
+    "turndown": "7.2.1",
+    "turndown-plugin-gfm": "1.0.2",
+    "wordgard": "0.6.0"
+  },
+  "devDependencies": {
+    "vite": "^7.3.7"
+  }
+}
