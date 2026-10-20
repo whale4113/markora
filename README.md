@@ -1,60 +1,77 @@
-# 纸间 · Wordgard Markdown Demo
+# 纸间 · Wordgard Markdown 就地编辑器
 
-在浏览器中重建 Typora 式写作流程。编辑核心使用真实 **Wordgard 0.6.0**，不复制 Typora 发布代码。文档状态、格式命令、表格、任务节点、选区、撤销都经过 Wordgard 的模型与 transaction。
+工作台使用 **React + TypeScript + Vite**。React 管理文档库、工具栏、模式、对话框、通知与统计；Wordgard / CodeMirror 通过 ref 和布局 effect 接入，各自维护编辑 DOM、选区与撤销历史。现有 `zhijian-wordgard-v1` 本地草稿继续可读。
+
+默认正文现在采用 **所见即所得 + 聚焦展开 Markdown 标记** 的编辑方式：点击粗体显示可编辑的 `**` 或 `__`，点击链接显示原始地址/引用语法，离开后恢复排版。标题、行内代码、删除线、高亮、上下标、公式、图片及表格单元格使用相同的源文本/显示态分离原则。独立源码视图仍可使用，但普通语法编辑不需要切换视图。
+
+正文以原始 Markdown 为权威，Wordgard 文本节点保留真实符号；格式 marks 是从源文本计算的显示投影。焦点变化只改变显示形状，不插入临时字符、不改写文档、不新增撤销项。依据的原程序模块、受控重放证据与实现细节见 [IMPLEMENTATION.md](IMPLEMENTATION.md)。
+
+## 运行
 
 ```powershell
 cd D:\workspace\typora\wordgard-demo
 npm ci
 npm run dev
+# http://127.0.0.1:5173/
+npm test
+npm run typecheck
+npm run test:focus
+npm run build
 ```
 
-打开 http://127.0.0.1:5173/ 。生产构建：`npm run build`，输出 `dist/`；`npm run preview` 可预览该构建。
+根目录也提供 `npm run editor:dev`、`editor:test`、`editor:build`。`npm run editor:reference` 隔离重放原程序 30 模块的 11 个装饰分支并更新证据与测试参考。浏览器测试默认使用已安装的 Chrome，可通过 `CHROME_PATH` 指定 Chromium。
 
-## 已实现
+## 正文编辑
 
-| 功能 | 实现 |
+| 功能 | 当前行为 |
 | --- | --- |
-| 可视化编辑 | 标题、加粗、斜体、删除线、行内代码、列表、引用、分隔线 |
-| 历史 | Wordgard 原生 undo/redo；格式化不重置历史 |
-| 源码 | Markdown 双向切换，源码输入使用 textarea；提交时重建编辑状态 |
-| 表格 | 插入、编辑、单元格选择；更多插入→完整格式工具，访问原生行列/合并菜单 |
-| 任务 | 自定义 Wordgard checkbox 节点，点击勾选可撤销，支持 GFM 导出 |
-| 图片与链接 | URL 插入，图片也可由原生菜单/粘贴/拖放上传至浏览器 data URL |
-| 代码 | 代码块与语言标签 |
-| 数学与流程图 | 保留 LaTeX/Mermaid 源码，阅读模式使用 KaTeX/Mermaid 渲染 |
-| 脚注 | Markdown 标记与定义文本保留，阅读模式锚点跳转 |
-| 文件工作流 | 多文档库、搜索、标题、目录导航、导入 Markdown/HTML/JSON |
-| 本地优先 | localStorage 自动保存、最近20个文档快照、删除即时撤销 |
-| 查找替换 | 按 textblock 搜索，可跨行内格式；单次及全部替换，参与历史 |
-| 导出 | Markdown、HTML、JSON；PDF 使用浏览器打印 |
-| 写作模式 | 明暗主题、字号、阅读、专注、打字机光标居中与底部留白 |
-| 状态 | 汉字+词统计、字符数、估算阅读时间、选区位置 |
+| 焦点展开 | 光标/选区端点所在格式展开真实语法；其他格式保持排版；嵌套格式保留原始分隔符 |
+| 原文保留 | 正文保存直接读取原始 Markdown；聚焦、折叠、可视/源码无修改切换不经过 HTML→Markdown 规范化 |
+| 行内格式 | 加粗、斜体、删除线、高亮、代码、下划线、上下标；支持 `__` / `**`、`_` / `*`、`~sub~`、`^sup^` |
+| 链接/图片 | 就地编辑链接文字、地址、标题和引用形式；图片聚焦后编辑原始语法，另提供 URL/替代文字/本地上传入口 |
+| 标题/引用/列表 | 标题标记、Setext 下划线、引用和列表前缀在焦点处展开；Enter 延续列表、编号和任务，空项 Enter 退出 |
+| 表格 | 真实 Wordgard 行、列、单元格；在单元格内就地编辑 Markdown，保留表格排版；原生工具支持行列操作 |
+| 任务 | checkbox 由源文本生成；勾选修改原始 `[ ]` / `[x]`，可撤销；原始任务符号仍可编辑 |
+| 代码 | 保留围栏、语言和代码空白；聚焦显示围栏；JavaScript、TypeScript、Python、JSON、CSS、HTML、Shell、YAML、LaTeX 词法高亮 |
+| 公式/图表/HTML | 非焦点状态渲染 KaTeX、Mermaid 或消毒 HTML；点击结果，在同一正文块中编辑原始内容 |
+| 其他语法 | 脚注、多段定义、YAML/TOML Front Matter、动态 TOC、HTML 实体、转义、引用式链接 |
+| 选区 | Markdown UTF-16 偏移与 Wordgard 块/单元格坐标双向映射，支持跨块、跨格式替换与源码视图映射 |
+| 历史 | Wordgard 事务；文字输入合并，结构/工具操作隔离；切换文档保留各自会话历史 |
+| IME/拖选 | 组合输入和鼠标拖选期间冻结装饰替换，结束后协调模型与显示 |
+| 剪贴板 | 同应用复制保留原始 Markdown，另提供语义 HTML；粘贴、剪切、图片粘贴和拖入进入源文本事务 |
+| 查找替换 | 对可见文字检索，可跨行内格式；完整匹配覆盖语法对时一并替换对应标记，避免遗留孤立分隔符 |
 
-快捷键：Ctrl/⌘ B、I、K、Z、F、S；Ctrl/⌘ Shift M 切换源码；Esc 退出专注模式。Wordgard 自带 Markdown 输入规则和格式快捷键。
+## 工作台
 
-## 与完整 Typora 的区别
+CodeMirror 源码视图提供行号、语法高亮、括号匹配、缩进及独立撤销。源码提交进入正文历史，两种视图之间映射选区。
 
-这是浏览器 demo，不是官方完整工程，也没有宣称全部功能或文件格式逐字节兼容。未实现系统文件夹监视、桌面多窗口同步、系统词典/原生拼写检查、Pandoc、任意本机 shell 命令、图床服务、Typora 私有元数据与原生导出后端。
+文档库、标题、大纲、搜索、版本快照、明暗主题、字号、阅读、专注、打字机模式和统计继续可用。支持 Markdown/HTML/JSON 导入导出和打印/PDF；本机 Markdown 打开、保存和另存为通过 File System Access API，保存前检查磁盘基线。
 
-- 可视/源码切换会规范化空行、列表缩进等 Markdown 排版，不能保证原文逐字节不变；切换文档/提交源码会新建可视编辑器历史。
-- 脚注是语义文本适配，不是 Wordgard 原生脚注节点；多行定义可能折成单段。行内公式采用保守美元符号规则，复杂金额、转义和公式混写需检查源码。
-- 公式和流程图在阅读模式渲染，在编辑模式保留可编辑源码块。
-- 本地保存仅限同一个浏览器及网站来源；清理网站数据会删除文档。图片 data URL 会占用浏览器存储，保存失败有明确提示，应及时导出备份。
-- HTML 导出包含渲染结果，公式样式通过外部 KaTeX CSS 引用；本地页面构建内的 KaTeX 样式和字体已打包。
-- 没有云端文档同步、协作或服务器账号系统。站点私有发布访问控制不等于云文档存储。
+快捷键：Ctrl/⌘ B、I、K、Z、F；Ctrl/⌘ Shift M 切换源码。Ctrl/⌘ S 保存草稿，已关联本机文件时写入文件；Ctrl/⌘ Shift S 另存为。
 
-## 结构
+## 验证与边界
 
-- `src/engine.js`：Wordgard schema/transactions、真实任务节点、命令、搜索及编辑器生命周期。
-- `src/markdown.js`：Marked + DOMPurify + Turndown/GFM；预览公式/图表增强。
-- `src/main.js`：文档工作流、保存、历史、源码模式、UI 和导入导出。
-- `src/style.css`、`index.html`：中文写作工作台与响应式布局。
-- `.openai/hosting.json`：静态站点部署配置。
+- `test/browser/live.spec.js` 验证焦点、标记编辑、选区、历史、表格、列表、剪贴板、实体、语法高亮和组合输入状态；31 组源文本样本在聚焦/显示切换后保持原样，包含 CRLF。
+- 原程序装饰器的 11 个选定分支在无宿主/网络/文件 API 的 VM 中重放；保存来源哈希及依赖桩限制。测试参考不等于运行了完整原程序。
+- 旧 `engine.ts` 保留为富文本桥接回归适配器，**工作台实际入口使用 `live-engine.ts`**。旧桥接的幂等语料不是正文原文保留的替代测试。
+- 本轮对齐的是公开发布 JS 可证实的焦点式 Markdown 编辑机制。仍未逐分支证明全部 Typora 私有语法、平台兼容代码、真实 IME、超大文档性能及像素级行为等价；没有替换原 Electron 宿主或恢复主进程字节码。
+- 浏览器草稿只保存在当前来源 localStorage，清理网站数据会删除它们。撤销历史属于当前会话；本机文件句柄关闭页面后需重新选择。文件保存的基线检查不等于文件锁或文件夹监视。
+- HTML 导入会转换格式，任意 HTML/私有扩展并不保证完整语义往返；普通 GFM 无法表示全部富文本合并表格。独立源码编辑可以保留不认识的语法，但不意味着该语法已有渲染支持。
 
-## 验证
+详细验证范围见 [QA.md](QA.md)。Wordgard 及其他依赖的许可证归各作者。
 
-已实际在浏览器验证：新建/标题编辑、源码提交、真实文本键入、选中文字加粗、任务初始勾选/切换/撤销、3×2 表格插入与撤销、查找/单次替换、KaTeX 公式与 Mermaid SVG 渲染、Markdown 文件下载、主题切换。生产构建通过；验收时发现并修复了隐藏编辑器布局读取、任务解析默认值、代码语言保留及脚注分隔线累积问题。
+## 实现文件
 
-尚未穷尽验证：所有表格菜单分支、跨平台中文输入法、全部图片拖放场景、复杂 Markdown/HTML 往返、打印机或浏览器 PDF 输出。具体自动化未覆盖的部分不应视为已测试。
+- `src/App.tsx`：工作台状态、编辑器生命周期、模式切换及事件。
+- `src/components.tsx`：React 侧栏、工具栏、图标、弹窗与通知。
+- `src/library.ts`、`src/types.ts`：文档加载、版本快照与共享数据类型。
 
-官方参考：https://wordgard.net/ ，包内 `node_modules/wordgard/dist/*.d.ts` 与 schema 源码。所有依赖许可证归原作者，Wordgard 使用 MIT 许可证。
+- `src/live-engine.ts`：正文 Wordgard 模型、源坐标、事务、焦点与输入状态、剪贴板、历史。
+- `src/live-markdown.ts`：保留源码的词法装饰分析和代码高亮。
+- `src/live-table.ts`：真实表格与原始表格文本、坐标的双向转换。
+- `src/source-offsets.ts`：换行规范化时的原始偏移映射。
+- `src/markdown.ts`：解析/导出桥接、预览增强、引用定义解析。
+- `src/source.ts`、`src/files.ts`、`src/main.tsx`：源码视图、本机文件和 React 启动入口。
+- `patches/wordgard+0.6.0.patch`：隐藏语法/失焦/脱离 DOM 时的光标测量保护；`npm ci` 的 postinstall 自动应用，不能省略安装脚本。
+
+`npm run build` 先执行 TypeScript 检查再打包。`test/browser/react.spec.js` 覆盖 React 文档切换、标题/搜索/删除撤销、旧草稿/主题/CRLF 往返、弹窗与版本恢复；`caret.spec.js` 比较实际光标与文字的屏幕坐标。

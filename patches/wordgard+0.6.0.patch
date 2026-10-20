@@ -1,0 +1,31 @@
+diff --git a/node_modules/wordgard/dist/editor.js b/node_modules/wordgard/dist/editor.js
+index d84c0e1..6af18bb 100644
+--- a/node_modules/wordgard/dist/editor.js
++++ b/node_modules/wordgard/dist/editor.js
+@@ -4724,7 +4724,7 @@ function vertOverlap(a, b) {
+ const VertWidth = 30, VertGap = 5;
+ function getCursorInfo(wg, plugin, cont) {
+     let { state } = wg;
+-    if (!state.selection.isCursor)
++    if (!wg.hasFocus || !wg.contentDOM.isConnected || !state.selection.isCursor)
+         return cont(null);
+     let { head, headSide } = state.selection, { sel } = wg.state;
+     let { ref, rect } = coordsAtPos(wg, head, headSide);
+@@ -4787,7 +4787,7 @@ function getCursorInfo(wg, plugin, cont) {
+         }
+         pos += sibling.length;
+     }
+-    if (foundNode)
++    if (foundNode && foundRect)
+         return finish(CursorStyle.read(foundNode, foundRect.height), foundRect);
+     if (plugin.cached && Mark.sameSet(plugin.cached.marks, marks) && plugin.cached.parent.eq(sel.head.parent.node.tag))
+         return finish(plugin.cached.style);
+@@ -4804,7 +4804,7 @@ function getCursorInfo(wg, plugin, cont) {
+             while (inner.firstChild)
+                 inner = inner.firstChild;
+             let r = textRange(inner, 0, 1).getClientRects()[0];
+-            finish(CursorStyle.read(inner, r.height), r);
++            if (r) finish(CursorStyle.read(inner, r.height), r); else finish(null);
+         });
+     });
+ }

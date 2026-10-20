@@ -5,20 +5,42 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 5173",
-    "build": "vite build",
-    "preview": "vite preview --host 127.0.0.1 --port 5173"
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 5173",
+    "test": "playwright test",
+    "test:focus": "playwright test live.spec.js",
+    "test:roundtrip": "playwright test bridge.spec.js",
+    "typecheck": "tsc --noEmit",
+    "postinstall": "patch-package"
   },
   "dependencies": {
+    "@codemirror/commands": "^6.11.1",
+    "@codemirror/lang-markdown": "^6.5.2",
+    "@codemirror/language": "^6.13.1",
+    "@codemirror/search": "^6.7.2",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.15",
     "dompurify": "^3.4.17",
     "katex": "^0.19.0",
-    "lucide": "0.468.0",
+    "lucide-react": "^1.60.0",
     "marked": "17.0.0",
     "mermaid": "^11.17.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "turndown": "7.2.1",
     "turndown-plugin-gfm": "1.0.2",
     "wordgard": "0.6.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/katex": "^0.16.8",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/turndown": "^5.0.6",
+    "@types/wicg-file-system-access": "^2023.10.7",
+    "@vitejs/plugin-react": "^5.2.0",
+    "patch-package": "^8.0.1",
+    "typescript": "^7.0.2",
     "vite": "^7.3.7"
   }
 }

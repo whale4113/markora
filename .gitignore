@@ -3,3 +3,5 @@ dist/
 .sites-runtime/
 *.log
 audit.json
+test-results/
+playwright-report/

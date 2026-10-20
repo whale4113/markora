@@ -1,0 +1,99 @@
+{
+  "date": "2026-10-20",
+  "authority": "controlled-replay",
+  "source": "reverse-engineered/editor/modules/30-render-decoration.js",
+  "sha256": "9db0556ff222f66d48faee688dcbf9edebab8c23f1462117686a4e8eb8739612",
+  "limitations": [
+    "Only the original module 30 decoration factory and selected branches executed.",
+    "Helpers and dependency type constants are explicit stubs; no real editor runtime or focus/selection code executed.",
+    "CSS visibility and browser selection are verified separately in the new editor tests."
+  ],
+  "results": [
+    {
+      "input": {
+        "type": "strong",
+        "pattern": "**",
+        "inner": "bold"
+      },
+      "html": "<span md-inline='strong' class='md-pair-s '><span class='md-meta md-before'>**</span><strong>bold</strong><span class='md-meta md-after'>**</span></span>"
+    },
+    {
+      "input": {
+        "type": "strong",
+        "pattern": "__",
+        "inner": "bold"
+      },
+      "html": "<span md-inline='strong' class='md-pair-s '><span class='md-meta md-before'>__</span><strong>bold</strong><span class='md-meta md-after'>__</span></span>"
+    },
+    {
+      "input": {
+        "type": "em",
+        "pattern": "*",
+        "inner": "italic"
+      },
+      "html": "<span md-inline='em' class='md-pair-s '><span class='md-meta md-before'>*</span><em>italic</em><span class='md-meta md-after'>*</span></span>"
+    },
+    {
+      "input": {
+        "type": "code",
+        "pattern": "`",
+        "text": "code"
+      },
+      "html": "<span md-inline='code' spellcheck='false' class='md-pair-s'><span class='md-meta md-before'>`</span><code>code</code><span class='md-meta md-after'>`</span></span>"
+    },
+    {
+      "input": {
+        "type": "del",
+        "pattern": "~~",
+        "inner": "deleted"
+      },
+      "html": "<span md-inline='del' class='md-pair-s'><span class='md-meta md-before'>~~</span><del>deleted</del><span class='md-meta md-after'>~~</span></span>"
+    },
+    {
+      "input": {
+        "type": "highlight",
+        "inner": "highlight"
+      },
+      "html": "<span md-inline='highlight' class='md-pair-s'><span class='md-meta md-before'>==</span><mark>highlight</mark><span class='md-meta md-after'>==</span></span>"
+    },
+    {
+      "input": {
+        "type": "subscript",
+        "inner": "2"
+      },
+      "html": "<sub md-inline='subscript' class='md-pair-s'><span class='md-meta md-before'>~</span>2<span class='md-meta md-after'>~</span></sub>"
+    },
+    {
+      "input": {
+        "type": "superscript",
+        "inner": "2"
+      },
+      "html": "<sup md-inline='superscript' class='md-pair-s'><span class='md-meta md-before'>^</span>2<span class='md-meta md-after'>^</span></sup>"
+    },
+    {
+      "input": {
+        "type": "heading",
+        "meta_before": "# ",
+        "inner": "Heading"
+      },
+      "html": "<span class='md-block-like'><span class='md-blockmeta'># </span><span class='md-header-span'>Heading</span></span>"
+    },
+    {
+      "input": {
+        "type": "blockquote",
+        "pattern": "> ",
+        "inner": "Quote"
+      },
+      "html": "<span class='md-block-like'><span class='md-blockmeta'>> </span>Quote</span>"
+    },
+    {
+      "input": {
+        "type": "def_footnote",
+        "ref": "note",
+        "pattern": " ",
+        "inner": "Definition"
+      },
+      "html": "<span class='md-block-like' mdlike='def_footnote'><span class='md-blockmeta'>[^</span>note<span class='md-blockmeta'>]: </span><span class='md-def-content'>Definition</span></span>"
+    }
+  ]
+}
